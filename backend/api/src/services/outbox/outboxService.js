@@ -86,7 +86,7 @@ export class OutboxService {
    * 'pending' so any replica can reclaim them.
    */
   async markPublished(eventId) {
-    const { error } = await supabaseAdmin
+    const { data, error } = await supabaseAdmin
       .from('event_outbox')
       .update({ status: 'published', published_at: new Date().toISOString() })
       .eq('event_id', eventId);
@@ -213,8 +213,8 @@ export class OutboxService {
       .eq('status', 'publishing')
       .lt('attempts', maxRetries);
 
-    if (result?.error) {
-      logger.error('[OutboxService] Failed to requeue failed events:', result.error.message);
+    if (error) {
+      logger.error('[OutboxService] Failed to requeue failed events:', error.message);
     }
   }
 
